@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>MOD5 – Abbina la Zona ATEX</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#4a148c,#6a1b9a,#7b1fa2);min-height:100vh;overflow:hidden;display:flex;justify-content:center;align-items:center}
+.container{background:#fff;width:800px;height:550px;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.header{background:linear-gradient(135deg,#4a148c,#6a1b9a);color:#fff;padding:11px 18px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.header h1{font-size:15px;font-weight:700}.header p{font-size:11px;opacity:.8;margin-top:1px}
+button{padding:7px 13px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s}
+.btn-white{background:#fff;color:#4a148c}.btn-white:hover{background:#f3e5f5}
+.btn-outline{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)}.btn-outline:hover{background:rgba(255,255,255,.25)}
+.btn-group{display:flex;gap:8px}
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.hidden{display:none!important}
+.instr{padding:18px 24px;overflow-y:auto;flex:1}
+.instr h2{color:#1b5e20;font-size:24px;margin-bottom:10px; margin-top: 20px}
+.instr p,.instr li{font-size:20px;line-height:1.6;color:#444;margin-bottom:5px; margin-top: 20px}
+.zone-preview{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.zp{flex:1;min-width:110px;border-radius:8px;padding:8px 10px;font-size:11px;font-weight:700;text-align:center;line-height:1.5}
+.zp0{background:#fce4ec;border:2px solid #c62828;color:#b71c1c}
+.zp1{background:#fff3e0;border:2px solid #e65100;color:#bf360c}
+.zp2{background:#fff8e1;border:2px solid #f9a825;color:#e65100}
+.zp20{background:#e8eaf6;border:2px solid #3949ab;color:#1a237e}
+.zp21{background:#e3f2fd;border:2px solid #1565c0;color:#0d47a1}
+.zp22{background:#e8f5e9;border:2px solid #2e7d32;color:#1b5e20}
+.start-btn{background:linear-gradient(135deg,#4a148c,#6a1b9a);color:#fff;padding:11px 32px;font-size:14px;border-radius:8px;display:block;margin:14px auto 0;cursor:pointer;border:none;font-weight:600}
+.start-btn:hover{transform:translateY(-2px)}
+.game-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:8px 14px;gap:6px}
+.score-row{display:flex;align-items:center;gap:12px;flex-shrink:0;font-size:12px;color:#555}
+.prog-bar{flex:1;height:6px;background:#eee;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#4a148c,#ce93d8);border-radius:3px;transition:width .4s}
+.score-lbl{font-weight:700;color:#4a148c;white-space:nowrap}
+.check-btn{background:linear-gradient(135deg,#4a148c,#6a1b9a);color:#fff;padding:7px 18px;font-size:12px;border-radius:7px;cursor:pointer;border:none;font-weight:600}
+.check-btn:disabled{background:#ccc;cursor:not-allowed}
+.pool-row{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;padding:2px 0}
+.item-card{background:#fff;border:2px solid #e1bee7;border-radius:7px;padding:5px 9px;cursor:grab;font-size:12.5px;color:#333;line-height:1.35;transition:all .2s;user-select:none;font-weight:500;flex-shrink:0;max-width:210px}
+.item-card:hover{border-color:#6a1b9a;background:#f3e5f5;transform:translateY(-2px)}
+.item-card.placed{display:none}
+.containers-row{height:230px;display:flex;gap:6px;min-height:0}
+.cat-col{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
+.cat-lbl{border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;text-align:center;padding:5px;flex-shrink:0;line-height:1.1}
+.lbl0{background:#c62828;color:#fff}.lbl1{background:#e65100;color:#fff}
+.lbl2{background:#f9a825;color:#fff}.lbl20{background:#3949ab;color:#fff}
+.lbl21{background:#1565c0;color:#fff}.lbl22{background:#2e7d32;color:#fff}
+.drop-zone{flex:1;border:2.5px dashed #ccc;border-radius:7px;padding:3px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;transition:all .2s;min-height:0;background:#fafafa}
+.drop-zone.over{border-color:#6a1b9a;background:#f3e5f5}
+.dropped{border-radius:5px;padding:4px 16px 4px 5px;font-size:9.5px;font-weight:600;position:relative;line-height:1.2;border:1.5px solid #ccc;background:#fff;color:#333;flex-shrink:0}
+.dropped.correct-d{border-color:#2e7d32;background:#e8f5e9;color:#1b5e20}
+.dropped.wrong-d{border-color:#c62828;background:#ffebee;color:#b71c1c}
+.rm-btn{position:absolute;top:2px;right:2px;background:#9e9e9e;color:#fff;border:none;border-radius:50%;width:12px;height:12px;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.result-page{flex:1;display:flex;align-items:center;justify-content:center;padding:20px}
+.result-box{text-align:center;max-width:480px}
+.result-icon{font-size:55px;margin-bottom:12px}
+.result-box h2{font-size:20px;font-weight:700;color:#4a148c;margin-bottom:8px}
+.result-box p{font-size:13px;color:#555;line-height:1.6;margin-bottom:15px}
+.result-score{background:#f3e5f5;border-radius:10px;padding:10px 20px;font-size:15px;font-weight:700;color:#4a148c;margin-bottom:15px;display:inline-block}
+.result-btns{display:flex;gap:10px;justify-content:center}
+.btn-prim{background:linear-gradient(135deg,#4a148c,#6a1b9a);color:#fff;padding:10px 24px;font-size:13px;border-radius:8px;cursor:pointer;border:none;font-weight:600}
+.btn-sec{background:#78909c;color:#fff;padding:10px 24px;font-size:13px;border-radius:8px;cursor:pointer;border:none;font-weight:600}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div><h1>💥 Abbina la Descrizione alla Zona ATEX</h1><p>Modulo 5 – Rischio esplosione e aree ATEX in logistica</p></div>
+    <div class="btn-group">
+      <button class="btn-outline" onclick="resetGame()">🔄 Rigioca</button>
+      <button class="btn-white" onclick="window.close()">Torna al corso</button>
+    </div>
+  </div>
+  <div class="content">
+    <div id="instrPage" class="instr">
+      <h2>🎯 Obiettivo</h2>
+      <p>Le zone ATEX classificano la probabilità di formazione di atmosfere esplosive. Trascina ciascuna delle 12 descrizioni nella zona ATEX corretta.</p>
+      <div class="zone-preview">
+        <div class="zp zp0">🔴 ZONA 0<br><span style="font-weight:400;font-size:10px">Gas/vapori: sempre presente</span></div>
+        <div class="zp zp1">🟠 ZONA 1<br><span style="font-weight:400;font-size:10px">Gas/vapori: probabile</span></div>
+        <div class="zp zp2">🟡 ZONA 2<br><span style="font-weight:400;font-size:10px">Gas/vapori: rara/breve</span></div>
+        <div class="zp zp20">🔵 ZONA 20<br><span style="font-weight:400;font-size:10px">Polveri: sempre presente</span></div>
+        <div class="zp zp21">🔷 ZONA 21<br><span style="font-weight:400;font-size:10px">Polveri: probabile</span></div>
+        <div class="zp zp22">🟢 ZONA 22<br><span style="font-weight:400;font-size:10px">Polveri: rara/breve</span></div>
+      </div>
+      <ul><li>Trascina le descrizioni nelle zone oppure clicca per selezionare e poi clicca la zona</li></ul>
+      <button class="start-btn" onclick="startGame()">▶ Inizia il Gioco</button>
+    </div>
+    <div id="gamePage" class="game-wrap hidden">
+      <div class="score-row">Posizionati: <span class="score-lbl"><span id="placedCount">0</span>/12</span>
+        <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+        <button class="check-btn" id="checkBtn" onclick="checkAnswers()" disabled>Verifica ✓</button>
+      </div>
+      <div class="pool-row" id="poolRow"></div>
+      <div class="containers-row">
+        <div class="cat-col"><div class="cat-lbl lbl0">🔴 ZONA 0<br>Gas sempre</div><div class="drop-zone" data-cat="z0" id="zone-z0" ondragover="onOver(event)" ondrop="onDrop(event)" ondragleave="onLeave(event)"></div></div>
+        <div class="cat-col"><div class="cat-lbl lbl1">🟠 ZONA 1<br>Gas probabile</div><div class="drop-zone" data-cat="z1" id="zone-z1" ondragover="onOver(event)" ondrop="onDrop(event)" ondragleave="onLeave(event)"></div></div>
+        <div class="cat-col"><div class="cat-lbl lbl2">🟡 ZONA 2<br>Gas rara</div><div class="drop-zone" data-cat="z2" id="zone-z2" ondragover="onOver(event)" ondrop="onDrop(event)" ondragleave="onLeave(event)"></div></div>
+        <div class="cat-col"><div class="cat-lbl lbl20">🔵 ZONA 20<br>Polveri sempre</div><div class="drop-zone" data-cat="z20" id="zone-z20" ondragover="onOver(event)" ondrop="onDrop(event)" ondragleave="onLeave(event)"></div></div>
+        <div class="cat-col"><div class="cat-lbl lbl21">🔷 ZONA 21<br>Polveri probabile</div><div class="drop-zone" data-cat="z21" id="zone-z21" ondragover="onOver(event)" ondrop="onDrop(event)" ondragleave="onLeave(event)"></div></div>
+        <div class="cat-col"><div class="cat-lbl lbl22">🟢 ZONA 22<br>Polveri rara</div><div class="drop-zone" data-cat="z22" id="zone-z22" ondragover="onOver(event)" ondrop="onDrop(event)" ondragleave="onLeave(event)"></div></div>
+      </div>
+    </div>
+    <div id="resultPage" class="result-page hidden">
+      <div class="result-box">
+        <div class="result-icon" id="resultIcon"></div>
+        <h2 id="resultTitle"></h2><p id="resultText"></p>
+        <div class="result-score" id="resultScore"></div>
+        <div class="result-btns">
+          <button class="btn-prim" onclick="resetGame()">🔄 Rigioca</button>
+          <button class="btn-sec" onclick="window.close()">Torna al corso</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const ITEMS=[
+  {id:1,text:'Interno di un serbatoio contenente liquido infiammabile',cat:'z0'},
+  {id:2,text:'Spazio interno di una condotta in cui scorre gas combustibile',cat:'z0'},
+  {id:3,text:'Area intorno a valvole di scarico di serbatoi di carburante',cat:'z1'},
+  {id:4,text:'Zona attorno all\'apertura di riempimento di un serbatoio di benzina',cat:'z1'},
+  {id:5,text:'Area adiacente a una zona 1 che viene ventilata normalmente',cat:'z2'},
+  {id:6,text:'Zona vicina a raccordi di tubazioni contenenti gas — perdita solo in caso di guasto',cat:'z2'},
+  {id:7,text:'Interno di un silo o tramoggia con polvere combustibile in sospensione continua',cat:'z20'},
+  {id:8,text:'Interno di un convogliatore pneumatico di polveri durante il funzionamento',cat:'z20'},
+  {id:9,text:'Area intorno all\'apertura di carico di un impianto di insaccamento polveri',cat:'z21'},
+  {id:10,text:'Zona attorno a filtri e cicloni di impianti di trattamento polveri',cat:'z21'},
+  {id:11,text:'Area adiacente a una zona 21 in cui le polveri possono accumularsi solo raramente',cat:'z22'},
+  {id:12,text:'Zona vicino a bocchette di areazione di silos — strato di polvere solo in caso di malfunzionamento',cat:'z22'},
+];
+let dragId=null,placed=new Set(),lastClicked=null;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function startGame(){
+  document.getElementById('instrPage').classList.add('hidden');
+  document.getElementById('gamePage').classList.remove('hidden');
+  placed.clear();lastClicked=null;
+  const pool=document.getElementById('poolRow');pool.innerHTML='';
+  ['z0','z1','z2','z20','z21','z22'].forEach(c=>document.getElementById('zone-'+c).innerHTML='');
+  shuffle(ITEMS).forEach(it=>{
+    const d=document.createElement('div');
+    d.className='item-card';d.textContent=it.text;d.dataset.id=it.id;d.draggable=true;
+    d.addEventListener('dragstart',()=>dragId=it.id);
+    d.addEventListener('click',()=>{
+      if(placed.has(it.id))return;
+      if(lastClicked===it.id){lastClicked=null;d.style.outline='';return;}
+      document.querySelectorAll('.item-card').forEach(c=>c.style.outline='');
+      lastClicked=it.id;d.style.outline='2px solid #6a1b9a';
+    });
+    pool.appendChild(d);
+  });
+  updateProgress();
+}
+function onOver(e){e.preventDefault();e.currentTarget.classList.add('over')}
+function onLeave(e){e.currentTarget.classList.remove('over')}
+function onDrop(e){e.preventDefault();e.currentTarget.classList.remove('over');if(!dragId)return;dropItem(dragId,e.currentTarget.dataset.cat);dragId=null;}
+function dropItem(id,cat){
+  if(placed.has(id))return;
+  placed.add(id);
+  const orig=document.querySelector(`[data-id="${id}"]`);if(orig)orig.classList.add('placed');
+  const zone=document.getElementById('zone-'+cat);
+  const it=ITEMS.find(x=>x.id==id);
+  const d=document.createElement('div');
+  d.className='dropped';d.dataset.id=id;d.dataset.cat=cat;d.textContent=it.text;
+  const rm=document.createElement('button');rm.className='rm-btn';rm.textContent='×';
+  rm.onclick=()=>{
+    placed.delete(id);zone.removeChild(d);
+    const card=document.querySelector(`.item-card[data-id="${id}"]`);if(card)card.classList.remove('placed');
+    updateProgress();
+  };
+  d.appendChild(rm);zone.appendChild(d);
+  lastClicked=null;document.querySelectorAll('.item-card').forEach(c=>c.style.outline='');
+  updateProgress();
+}
+['z0','z1','z2','z20','z21','z22'].forEach(cat=>{
+  document.getElementById('zone-'+cat).addEventListener('click',()=>{
+    if(lastClicked){dropItem(lastClicked,cat);lastClicked=null;document.querySelectorAll('.item-card').forEach(c=>c.style.outline='');}
+  });
+});
+function updateProgress(){
+  const n=placed.size;
+  document.getElementById('placedCount').textContent=n;
+  document.getElementById('progFill').style.width=(n/12*100)+'%';
+  document.getElementById('checkBtn').disabled=n<12;
+}
+function checkAnswers(){
+  let correct=0;
+  document.querySelectorAll('.dropped').forEach(d=>{
+    const it=ITEMS.find(x=>x.id==d.dataset.id);
+    const ok=it.cat===d.dataset.cat;
+    d.className='dropped '+(ok?'correct-d':'wrong-d');
+    const rm=d.querySelector('.rm-btn');if(rm)rm.style.display='none';
+    if(ok)correct++;
+  });
+  document.getElementById('gamePage').classList.add('hidden');
+  document.getElementById('resultPage').classList.remove('hidden');
+  const pct=correct/12;
+  document.getElementById('resultIcon').textContent=pct>=0.8?'🏆':pct>=0.5?'👍':'💪';
+  document.getElementById('resultTitle').textContent=pct>=0.8?'Ottimo! Conosci le zone ATEX!':pct>=0.5?'Buon risultato!':'Riprova!';
+  document.getElementById('resultText').textContent=pct>=0.8?'Sai classificare correttamente le zone a rischio esplosione. Fondamentale per sapere quali attrezzature usare e come comportarsi.':pct>=0.5?'Buona base. Ripassа la differenza tra zone gas (0/1/2) e zone polveri (20/21/22).':'Rileggi il Modulo 6. Ricorda: 0/1/2 per gas e vapori, 20/21/22 per polveri combustibili.';
+  document.getElementById('resultScore').textContent=correct+'/12 corretti';
+}
+function resetGame(){
+  document.getElementById('resultPage').classList.add('hidden');
+  document.getElementById('gamePage').classList.add('hidden');
+  document.getElementById('instrPage').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
